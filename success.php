@@ -1,12 +1,25 @@
-<?php 
+<?php
 
+echo "<table class='table'>
+  <thead>
+    <tr>
+      <th scope='col'>#</th>
+      <th scope='col'>First</th>
+      <th scope='col'>Last</th>
+      <th scope='col'>Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>";
+     $new_filename = fopen('users.csv', 'r');
+   while (($user_data = fgetcsv($new_filename))!== false) {
+     echo "<td> $user_data[0] <td>";
+     echo "<td> $user_data[1] <td>";
+     echo "<td><img src='uploads/'".$user_data[2]."/></td>";
 
-$new_filename = fopen('users.csv', 'r');
-
-while (($data = fgetcsv($new_filename))!== false) {
-   echo $data[0];
-   echo $data[1];
-   echo "uploads/".$data[2];
+    echo "</tr>
+  </tbody>
+</table>";
   
 }
 fclose($new_filename); 
