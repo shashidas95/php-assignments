@@ -1,5 +1,4 @@
 
-<?php require_once('db.php');?> 
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,27 +26,46 @@
 	</form>
 
 	<?php 
-		if (isset($_POST['register'])) {
-			// Get the form data and store it in variables
-			$first_name = $_POST['first_name'];
-			$last_name = $_POST['last_name'];
-			$email = $_POST['email'];
-			$password = $_POST['password'];
-			$confirm_password = $_POST['confirm_password'];
+	
+    $login_credentials = array();
+	// Specify the file path
+	$file_path = 'login_credentials.txt';
+			
+	// Open the file for writing
+	$fileHandle = fopen($file_path, 'a');
 
-			// Validate the form data
-			if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
-				echo "<p>All fields are required and must not be empty</p>";
-			} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-				echo "<p>Invalid email format</p>";
-			} elseif ($password !== $confirm_password) {
-				echo "<p>Password and Confirm Password do not match</p>";
-			} else {
-				echo "<p>Registration successful. Welcome, $first_name!</p>";
-				// Save the user data in a database or a file
-			}
-		}
-	?>
+	// // Close the file handle
+	// fclose($fileHandle);
+
+    if (isset($_POST['register'])) {
+        // Get the form data and store it in variables
+        $first_name = $_POST['first_name'];
+        $last_name = $_POST['last_name'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
+
+        // Validate the form data
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
+            echo "<p>All fields are required and must not be empty</p>";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo "<p>Invalid email format</p>";
+        } elseif ($password !== $confirm_password) {
+            echo "<p>Password and Confirm Password do not match</p>";
+        } else {
+            $login_credentials['email'] = $email;
+            $login_credentials['password'] = $password;
+			
+
+			$file_contents = serialize($login_credentials);
+			file_put_contents($file_path, $file_contents);
+
+            echo "<p>Registration successful. Welcome, $first_name!</p>";
+            // Save the user data in a database or a file
+        }
+    }
+
+?>
 
 	<h2>User Login Form</h2>
 	<form method="post" action="">
@@ -61,27 +79,29 @@
 	</form>
 
 	<?php 
-		if (isset($_POST['login'])) {
-			// Get the form data and store it in variables
-			$email = $_POST['email'];
-			$password = $_POST['password'];
+    if (isset($_POST['login'])) {
+        // Get the form data and store it in variables
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-			// Validate the form data
-			if (empty($email) || empty($password)) {
-				echo "<p>All fields are required and must not be empty</p>";
-			} else {
-				// Check if the user credentials are correct
-				// For this example, we assume that the correct email is 'test@example.com'
-				// and the correct password is 'password123'
-				if ($email === 'test@example.com' && $password === 'password123') {
-					// Redirect the user to a welcome page that displays their first name
-					header('Location: welcome.php?first_name=Test');
-					exit;
-				} else {
-					echo "<p>Invalid email or password</p>";
-				}
-			}
-		}
-	?>
+        // Validate the form data
+        if (empty($email) || empty($password)) {
+            echo "<p>All fields are required and must not be empty</p>";
+        } else {
+            // Check if the user credentials are correct
+			$file_path = 'login_credentials.txt';
+			$file_contents = file_get_contents($file_path);
+			$login_credentials = unserialize($file_contents);
+
+
+            if (!empty($login_credentials) && $email == $login_credentials['email'] && $password == $login_credentials['password']) {
+               
+               echo "<p>Login successful. Welcome, $first_name!</p>";
+            } else {
+                echo 'Login failed';
+            }
+        }
+    }
+?>
 </body>
 </html>
